@@ -1,17 +1,11 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
-var saveBtnEl = $('.saveBtn');
-var descriptionEl = $('.description')
+
 
 $(document).ready(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  // 
+  var saveBtnEl = $('.saveBtn');
+  
   // Click listener for the savebutton of a given timeblock
   saveBtnEl.on('click', function () {
     // Grab the save button as a variable and access the parent, grab the id of the parent div
@@ -26,15 +20,8 @@ $(document).ready(function () {
     // Grab the input of the textarea and save in local storage using timeblock id as key
     userInput = description.val();
     localStorage.setItem(timeBlockId, userInput);
-    return (timeBlockId, timeBlock)
   })
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-
+  
   // Function to update the timeblock colors
   function timeCheck() {
     // Access current hour
@@ -64,11 +51,51 @@ $(document).ready(function () {
   // Call the function every minute after to make sure colors are always accurate to current time
   setInterval(timeCheck, 60000);
   
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
+  // Function to get data from localStorage
+  function getData() {
+    // Grab timeblock elements and store in an array
+    var timeBlockEl = $(".time-block");
+    var timeBlockArr = timeBlockEl.toArray();
+    // Initialize array for past data entries
+    var pastEntries = [];
+    // Loop to grab all the entries from localStorage 
+    for (var i = 0; i < timeBlockArr.length; i++) {
+      // Create a key using current loop index to match localStorage key
+      var key = "hour-" + (i+9);
+      console.log(key);
+      // Grab entry from localStorage and set in entry variable
+      var entry = localStorage.getItem(key);
+      console.log(entry);
+      // store entry in array of past data
+      pastEntries[i] = entry;
+    }
+    // Loop to display past enries in corresponding textarea
+    for (var i = 0; i < timeBlockArr.length; i++) {
+      console.log(timeBlockArr[i]);
+      // Grab element currently in loop
+      var timeBlock = $(timeBlockArr[i]);
+      // GRab textarea child of timeblock
+      var textArea = timeBlock.children("textarea");
+      // Set value of textarea to corresponding past entry
+      $(textArea).val(pastEntries[i]);
+    }
+    console.log("pastentries:" + pastEntries);
+    
+  }
+  getData();
+ 
+  // Function to set date on header
+  function setDate() {
+    // Grab element to display in
+    var headerDate = $("#currentDay");
+    // Access and format the date to make it look nice
+    var date = dayjs().format("ddd, MMMM D h:mmA");
+    // Set the text of the header date
+    headerDate.text(date);
+  }
+  // Call the function to ensure colors are accurate on page load
+  setDate();
+  // Call the function every second after to make sure date is always accurate to current time
+  setInterval(setDate, 1000);
 });
 
